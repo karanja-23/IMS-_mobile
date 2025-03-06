@@ -44,7 +44,7 @@ function WelcomeScreen({ navigation }) {
             }
             else{
               setUser(data);
-              setData(data.scanned);  
+              setData(data.requests);  
               navigate.navigate("Home")
             }
              
@@ -65,7 +65,7 @@ function WelcomeScreen({ navigation }) {
   }, [navigation]);
   return (
     <ImageBackground style={styles.background } >
-      <Image style={styles.logo} source={require("../assets/darkLogo.png")} />
+      <Image style={styles.logo} source={require("../assets/logo.png")} />
       <View >
         <ActivityIndicator size="large" color={colors.white} />
       </View>
@@ -80,9 +80,9 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: colors.blue,
+    backgroundColor: colors.white,
     gap:0,
-    opacity:0.99
+    
 
   },
   logo: {
