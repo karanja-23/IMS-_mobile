@@ -36,7 +36,7 @@ import {
       })
       .then(response => response.json())
       .then(data => {
-        console.log(data)
+        
         if (data.length === 0) {
           setLaoding(false)
           setShowNotFound(true)
@@ -96,36 +96,34 @@ import {
     }, [showAlert]);
     
     const handleBorrow = useCallback(()=>{
-
+      
       setItemLoading(true)
+
       if (assetData) {
-        const data = {
-          name: assetData.item,
-          user_id: user.id
-         
+        const new_request = {
+          asset_id: assetData.serial_no,
+          user_id: user.id,
+          user_name: user.name,
+          asset_name: assetData.item,        
         }
         
-        fetch('http://172.236.2.18:6010/scanned', {
+        fetch(`http://172.236.2.18:6010/requests`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify(data)
+          body: JSON.stringify(new_request)
         })
-        .then(response => response.json())
-        .then(async(data) => {
+        .then(response => {
+        
+          return response.json()
+        })
+        .catch(error => {
           
-          if ( data.message === 'Scanned entry created successfully') {
-            updateData()                    
-            setItemLoading(false)
-            setSuccess(true)  
-            setTimeout(() => {
-              setSuccess(false)
-              navigate.navigate("Home")
-            }, 400);
-
-
-          async function updateData(){
+        })
+        .then(data => {
+          
+          if (data.message === "Request created successfully"){
             fetch(`http://172.236.2.18:5000/users/protected/user`, {
               method: "GET",
               headers: {
@@ -135,37 +133,30 @@ import {
             })
             .then((response) => response.json())
             .then(data => {
-              setData(data.scanned); 
-              fetch('http://172.236.2.18:6010/requests', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                  asset_id: assetData.id,
-                  user_id: user.id,
-                  user_name: user.name,
-                  asset_name: assetData.item
-                })
-              })
-              .then(response => response.json())
-              .then(data => {
-                console.log(data)
-              })
-            })   
-               
-            await Notifications.scheduleNotificationAsync({
-              content: {
-                title: "Moringa IMS",
-                body: `A request to borrow ${assetData.item} been sent to the admin for approval`,
-              },
-              trigger: null,
-              sound: true,
-              vibrate: true,
-            })       
-          
-          }
-          }
+              
+              setData(data.requests)
+            })
+            .then(() => {
+              setItemLoading(false)
+              setSuccess(true)
+              setTimeout(() => {
+                setSuccess(false)
+                navigate.navigate("Home")
+                sendNotification()
+              }, 400);
+              async function sendNotification(){
+                await Notifications.scheduleNotificationAsync({
+                  content: {
+                    title: "Moringa IMS",
+                    body: `A request to borrow ${assetData.item} been sent to the admin for approval`,
+                  },
+                  trigger: null,
+                  sound: true,
+                  vibrate: true,
+                })           
+              }
+            })
+          }  
         })
       }
       else {

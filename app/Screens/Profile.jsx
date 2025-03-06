@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet,Platform,StatusBar, TextInput, Button } from "react-native";
+import { View, Text, StyleSheet,Platform,StatusBar, TextInput, Button, TouchableOpacity } from "react-native";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import colors from "../config/colors";
 import { UserContext } from "../Contexts/userContext";
@@ -80,7 +80,7 @@ function Profile({navigation}){
             <Icon onPress={()=>{navigation.goBack()}} style={styles.back} name="arrow-back" size={27} color={colors.white} />
             <View style={styles.profile}>           
               <Text style={{color: colors.white, fontSize: 20, fontWeight: '900', marginBottom: 10}} >My Profile</Text>
-              <Icon name="perm-identity" size={70} color={colors.white} />
+              <Icon name="account-circle" size={70} color={colors.white} />
               <Text style={{color: colors.white, fontSize: 14, fontWeight: '500'}} >{profileName}</Text>
             </View>
             <View style={{marginHorizontal: 15, marginTop: 20}}>
@@ -133,24 +133,33 @@ function Profile({navigation}){
                 >
                    
                 </Button>
-                <Button 
-                  title="Logout"
-                  color={colors.orange}
+                <TouchableOpacity 
+                  style={{
+                    flexDirection: "row",
+                    width:"50%",
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: 2,
+                    alignSelf: 'center'
+                  }}
                   onPress={() => {
-                    async function logout() {
-                      await Notifications.getExpoPushTokenAsync(null);
+                    async function logout() {                      
                       await SecureStore.deleteItemAsync('access_token');
-                      await SecureStore.deleteItemAsync('expo_token');
+                                            
                       setUser(null);
                       setToken(null);
                       setData(null);
                       setExpoToken(null);
+                      
+                      navigation.navigate('SignIn')
                     }
                     logout()
-                    navigation.navigate('SignIn')
+                    
                   }}
-                >
-                </Button>                
+                >                  
+                  <Icon name="logout" size={25} color={colors.orange} />
+                  <Text style={{color:colors.orange, fontWeight: 700, fontSize: 16}}>Logout</Text>
+                </TouchableOpacity>                
                 </View>
             </View>
         </View>
