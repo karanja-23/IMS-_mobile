@@ -27,7 +27,11 @@ function Table() {
   const [orderByDate, setOrderByDate] = useState(entriesToDisplay);
   useEffect(() => {
     setQuery("");
-    setEntriesToDisplay(memoizedData?.slice(0, limit));
+    const sortedData = memoizedData?.sort((a, b) => {
+      return new Date(b.requested_at) - new Date(a.requested_at); // Sort by date
+    });
+    setFilteredData(sortedData);
+    setEntriesToDisplay(sortedData?.slice(0, limit));
   }, [memoizedData]);
   function handleSearch(query) {
     setQuery(query);
@@ -37,18 +41,19 @@ function Table() {
     const sortedData = filteredData.sort((a, b) => {
       return new Date(b.requested_at) - new Date(a.requested_at);
     });
+    setFilteredData(sortedData);
     setEntriesToDisplay(sortedData.slice(0, limit));
   }
 
   const handlePageChange = (page) => {
-    if (page < 1 || page > Math.ceil(entriesToDisplay.length / limit)) {
+    if (page < 1 || page > Math.ceil(filteredData.length / limit)) {
       return;
     }
     setCurrentPage(page);
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
-    setEntriesToDisplay(entriesToDisplay.slice(startIndex, endIndex));
-    setCurrentPage(page);
+    setEntriesToDisplay(filteredData.slice(startIndex, endIndex));
+    
   };
 
   return (
@@ -150,8 +155,13 @@ function Table() {
                 <DataTable.Cell style={{ maxWidth: "20%" }}>
                   <View
                     style={{
-                      backgroundColor:
-                        item.status === "pending" ? colors.orange : colors.blue,
+                      backgroundColor: item.status === "pending" 
+  ? colors.orange 
+  : item.status === "approved" 
+  ? colors.blue 
+  : item.status === "rejected" 
+  ? "red"
+  : colors.default,
                       height: "55%",
                       width: "90%",
                       borderRadius: 5,
