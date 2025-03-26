@@ -110,7 +110,7 @@ function SignIn() {
             setIsLoading(false),
               Alert.alert(
                 "Error !",
-                "Invalid password!",
+                "Invalid Credentials!",
                 [
                   {
                     text: "OK",

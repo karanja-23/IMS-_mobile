@@ -21,14 +21,12 @@ function WelcomeScreen({ navigation }) {
           const expoToken = await SecureStore.getItemAsync('expo_token');
           if (expoToken) {
             setExpoToken(expoToken);
-            console.log(expoToken);
+            
           }
         }
         getExpoTokenFromStorage();
         if (token) {
-          setToken(token);
-          console.log(token);   
-            
+          setToken(token);   
           fetch(`http://172.236.2.18:5000/users/protected/user`, {
             method: "GET",
             headers: {
@@ -68,7 +66,7 @@ function WelcomeScreen({ navigation }) {
     <ImageBackground style={styles.background } >
       <Image style={styles.logo} source={require("../assets/logo.png")} />
       <View >
-        <ActivityIndicator size="large" color={colors.white} />
+        <ActivityIndicator size="large" color={colors.blue} />
       </View>
 
     </ImageBackground>
