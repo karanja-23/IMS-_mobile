@@ -150,7 +150,7 @@ function Table() {
                   {dayjs(item.requested_at).format("YYYY-MM-DD HH:mm:ss")}
                 </DataTable.Cell>
                 <DataTable.Cell style={{ maxWidth: "40%" }}>
-                  {item.asset_name}
+                  {item.asset['name']}
                 </DataTable.Cell>
                 <DataTable.Cell style={{ maxWidth: "20%" }}>
                   <View

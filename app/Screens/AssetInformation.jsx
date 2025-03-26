@@ -29,24 +29,24 @@ import {
     const [showNotFound, setShowNotFound] = useState(false)
     const [showAlert, setShowAlert] = useState(false);
     useEffect(() => {
-    
+      
       setLaoding(true)
-      fetch(`http://172.236.2.18:5050/assets/filter?serial_no=${route.params.data}`,{
+      fetch(`https://mobileimsbackend.onrender.com/assets/filter/${route.params.data}`,{
         method: 'GET'
       })
       .then(response => response.json())
       .then(data => {
         
-        if (data.length === 0) {
+        if (!data['name']) {
           setLaoding(false)
           setShowNotFound(true)
         }else{
-          if (data[0].status === 'assigned' || data.status === 'borrowed') {
+          if (data.status === 'assigned' || data.status === 'borrowed') {
             setShowAlert(true)
           }
           else{
             setLaoding(false)
-            setAssetData(data[0])
+            setAssetData(data)
             setFetchedData(true)
           }
         }
@@ -101,13 +101,12 @@ import {
 
       if (assetData) {
         const new_request = {
-          asset_id: assetData.serial_no,
-          user_id: user.id,
-          user_name: user.name,
-          asset_name: assetData.item,        
+          asset_id: assetData.id,
+          user_id: user.id
+                 
         }
         
-        fetch(`http://172.236.2.18:6010/requests`, {
+        fetch(`https://mobileimsbackend.onrender.com/requests`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -118,13 +117,11 @@ import {
         
           return response.json()
         })
-        .catch(error => {
-          
-        })
+        
         .then(data => {
           
           if (data.message === "Request created successfully"){
-            fetch(`http://172.236.2.18:5000/users/protected/user`, {
+            fetch(`https://mobileimsbackend.onrender.com/protected/user`, {
               method: "GET",
               headers: {
                 Authorization: `Bearer ${Token}`,
@@ -136,6 +133,7 @@ import {
               
               setData(data.requests)
             })
+            
             .then(() => {
               setItemLoading(false)
               setSuccess(true)
@@ -148,7 +146,7 @@ import {
                 await Notifications.scheduleNotificationAsync({
                   content: {
                     title: "Moringa IMS",
-                    body: `A request to borrow ${assetData.item} been sent to the admin for approval`,
+                    body: `A request to borrow ${assetData.name} been sent to the admin for approval`,
                   },
                   trigger: null,
                   sound: true,
@@ -207,7 +205,7 @@ import {
           <View>
             <Text style={styles.titles}>Serial Number</Text>
             <TextInput
-             value={fetchedData ? assetData?.serial_no: ''}
+             value={fetchedData ? assetData?.serial_number: ''}
               placeholder="Asset Name"
               style={styles.input}
             ></TextInput>
@@ -215,7 +213,7 @@ import {
           <View>
             <Text style={[styles.titles,{opacity: loading ? 0.4 : 1}]}>Asset Name</Text>
             <TextInput
-              value={fetchedData ? assetData?.item : ''}
+              value={fetchedData ? assetData?.name : ''}
               placeholder="Asset Name"
               style={styles.input}
             ></TextInput>
@@ -224,7 +222,7 @@ import {
         <View style={{marginTop: 20, opacity: loading ? 0.4 : 1}}>
            <Text style={{fontSize:13, marginBottom: 5 ,fontWeight:19,fontWeight: "900", color: colors.grey,marginLeft: "10%"}}>Asset description</Text>
            <TextInput 
-           value={fetchedData ? assetData?.specifications : ''}            
+           value={fetchedData ? assetData?.description : ''}            
            multiline={true}
            numberOfLines={6}
            style={{width:"80%", backgroundColor: "lightgrey" ,textAlignVertical: "top" ,alignSelf: "center",height: 130}}>
@@ -244,7 +242,7 @@ import {
           <View>
             <Text style={styles.titles}>Category</Text>
             <TextInput
-            value={fetchedData ? assetData?.class_code : ''}
+            value={fetchedData ? assetData?.category['name'] : ''}
               placeholder="Asset Name"
               style={styles.input}
             ></TextInput>
@@ -255,7 +253,7 @@ import {
           <View>
             <Text style={styles.titles}>Location</Text>
             <TextInput
-              value={fetchedData ? assetData?.location_name : ''}
+              value={fetchedData ? assetData?.space['name'] : ''}
               placeholder="Asset Space"
               style={styles.input}
             ></TextInput>
@@ -263,7 +261,7 @@ import {
           <View>
             <Text style={styles.titles}>Assigned to:</Text>
             <TextInput
-            value={fetchedData ? assetData?.assigned_to : ''}
+            value={fetchedData ? assetData?.assign?? "Not assigned" : ''}
               placeholder="Asset Name"
               style={styles.input}
             ></TextInput>
