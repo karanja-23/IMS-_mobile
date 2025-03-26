@@ -17,9 +17,9 @@ import { height } from "@fortawesome/free-brands-svg-icons/fa42Group";
 function Header() {
   const navigation = useNavigation();
   const { user } = useContext(UserContext);
-  const [username, setUsername] = useState(user?.name);
+  const [username, setUsername] = useState(user?.username);
   useEffect(() => {
-    setUsername(user?.name);
+    setUsername(user?.username);
   }, [user]);
   return (
     <View style={{ flex: 1 }}>

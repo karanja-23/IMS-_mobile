@@ -10,21 +10,23 @@ function Profile({navigation}){
     const userRef = useRef(null);
     const {Token,setToken,setData, setExpoToken} = useContext(UserContext)
    const {setUser,user} = useContext(UserContext)
-   const [name, setName] = useState(user?.name)
+   const [name, setName] = useState(user?.username)
    const [email, setEmail] = useState(user?.email)
-   const [contact, setContact] = useState(user?.phone_number)
+   const [contact, setContact] = useState(user?.contact)
    const [password, setPassword] = useState(user?.password)
-   const [profileName, setProfileName] = useState(user?.name)
+   const [role, setRole] = useState(user?.role.name)
+   const [profileName, setProfileName] = useState(user?.username)
    async function handleEdit(){
     
     const userData = {
-        name: name,
+        username: name,
         email: email,
-        phone_number: contact,
-        password: password
+        contact: contact,    
+        password: password,   
+        
       };
-           
-     await fetch(`http://172.236.2.18:5000/users/${user.id}`,{
+      
+     await fetch(`https://mobileimsbackend.onrender.com/users/${user.id}`,{
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -33,10 +35,13 @@ function Profile({navigation}){
         },
         body: JSON.stringify(userData)
     })
-    .then(response => response.json())    
+    .then(response => {      
+        return response.json()
+    })    
     .then(data => {
-        
+       
         setUser(data)
+        
         if (data.email) {
             Alert.alert(
                 "Success !",
@@ -73,7 +78,7 @@ function Profile({navigation}){
     })
    }
    useEffect(() => {    
-    setProfileName(user?.name)
+    setProfileName(user?.username)
    },[user])
     return(
         <View style={styles.container}>
@@ -91,6 +96,15 @@ function Profile({navigation}){
                 style={styles.input}
                 placeholder="Name"
                 
+                >
+                    
+                </TextInput>
+                <Text style={styles.label} >Role</Text>
+                <TextInput
+                onChange={(event) => setRole(event.nativeEvent.text)}
+                value={user? role : ''}
+                style={[styles.input]}
+                placeholder="Role"
                 >
                     
                 </TextInput>
@@ -121,7 +135,8 @@ function Profile({navigation}){
                 placeholder="password"
                 >
                     
-                </TextInput>  
+                </TextInput>
+                  
                            
                 <View style={{gap: 20}}>
                 <Button 
